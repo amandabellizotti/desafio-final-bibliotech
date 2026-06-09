@@ -56,7 +56,7 @@ function entrar() {
             localStorage.setItem("logado", "true");
             localStorage.setItem("tipoUsuario", "admin");
 
-            window.location.href = "index.html";
+            window.location.href = "sistema.html";
 
         } else {
             alert("Login de administrador inválido");
@@ -72,7 +72,7 @@ function entrar() {
             localStorage.setItem("tipoUsuario", "cliente");
             localStorage.setItem("clienteNome", usuario);
 
-            window.location.href = "index.html";
+            window.location.href = "sistema.html";
 
         } else {
             alert("Preencha os campos");
@@ -450,11 +450,11 @@ const nomeCliente =
 
 // VERIFICA LOGIN
 if (
-    window.location.pathname.includes("index.html")
+    window.location.pathname.includes("sistema.html")
 ) {
 
     if(localStorage.getItem("logado") !== "true") {
-        window.location.href = "login.html";
+        window.location.href = "index.html";
     }
 }
 
@@ -525,7 +525,7 @@ function logout() {
     localStorage.removeItem("tipoUsuario");
     localStorage.removeItem("clienteNome");
 
-    window.location.href = "login.html";
+    window.location.href = "index.html";
 }
 
 

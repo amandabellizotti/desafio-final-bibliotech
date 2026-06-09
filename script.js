@@ -1,3 +1,86 @@
+// LISTA DE USUÁRIOS
+let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+
+// ABRIR MODAL
+function abrirCadastro() {
+    document.getElementById("modal-cadastro").style.display = "flex";
+}
+
+// FECHAR MODAL
+function fecharCadastro() {
+    document.getElementById("modal-cadastro").style.display = "none";
+}
+
+// CADASTRAR
+function cadastrar() {
+
+    const usuario = document.getElementById("novoUsuario").value;
+    const senha = document.getElementById("novaSenha").value;
+
+    if(usuario === "" || senha === "") {
+        alert("Preencha todos os campos");
+        return;
+    }
+
+    // VERIFICA SE JÁ EXISTE
+    const existe = usuarios.find(u => u.usuario === usuario);
+
+    if(existe) {
+        alert("Usuário já cadastrado");
+        return;
+    }
+
+    usuarios.push({
+        usuario,
+        senha
+    });
+
+    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+
+    alert("Cadastro realizado com sucesso!");
+
+    fecharCadastro();
+}
+
+function entrar() {
+
+    const tipo = document.getElementById("tipoUsuario").value;
+    const usuario = document.getElementById("usuario").value;
+    const senha = document.getElementById("senha").value;
+
+    // LOGIN ADMIN
+    if(tipo === "admin") {
+
+        if(usuario === "admin" && senha === "123") {
+
+            localStorage.setItem("logado", "true");
+            localStorage.setItem("tipoUsuario", "admin");
+
+            window.location.href = "index.html";
+
+        } else {
+            alert("Login de administrador inválido");
+        }
+    }
+
+    // LOGIN CLIENTE
+    else {
+
+        if(usuario !== "" && senha !== "") {
+
+            localStorage.setItem("logado", "true");
+            localStorage.setItem("tipoUsuario", "cliente");
+            localStorage.setItem("clienteNome", usuario);
+
+            window.location.href = "index.html";
+
+        } else {
+            alert("Preencha os campos");
+        }
+    }
+}
+
+//semana passada
 
 // LOCAL STORAGE
 let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
@@ -97,8 +180,10 @@ async function buscarLivros() {
         loading.innerText = "";
 
         if (dados.docs.length === 0) {
+
             resultadosLivros.innerHTML =
                 "<p>Nenhum livro encontrado</p>";
+
             return;
         }
 
@@ -114,36 +199,77 @@ async function buscarLivros() {
                 ? `https://covers.openlibrary.org/b/id/${livro.cover_i}-M.jpg`
                 : "https://via.placeholder.com/100";
 
-            resultadosLivros.innerHTML += `
-        <div class="livro">
+            // ADMIN
+            if(tipoUsuario === "admin") {
 
-          <img src="${capa}">
+                resultadosLivros.innerHTML += `
+                    <div class="livro">
 
-          <h3>${titulo}</h3>
+                        <img src="${capa}">
 
-          <p>${autor}</p>
+                        <div class="livro-info">
 
-          <select id="cliente-${index}">
-            <option value="">Selecione um cliente</option>
+                            <h3>${titulo}</h3>
 
-            ${clientes.map(cliente => `
-              <option value="${cliente.nome}">
-                ${cliente.nome}
-              </option>
-            `).join("")}
+                            <p>${autor}</p>
 
-          </select>
+                            <select id="cliente-${index}">
+                                <option value="">
+                                    Selecione um cliente
+                                </option>
 
-          <button onclick="finalizarEmprestimo(
-            '${titulo}',
-            '${capa}',
-            '${index}'
-          )">
-            Finalizar Empréstimo
-          </button>
+                                ${clientes.map(cliente => `
+                                    <option value="${cliente.nome}">
+                                        ${cliente.nome}
+                                    </option>
+                                `).join("")}
 
-        </div>
-      `;
+                            </select>
+
+                            <button onclick="
+                                finalizarEmprestimo(
+                                    '${titulo}',
+                                    '${capa}',
+                                    '${index}'
+                                )
+                            ">
+                                Finalizar Empréstimo
+                            </button>
+
+                        </div>
+
+                    </div>
+                `;
+            }
+
+            // CLIENTE
+            else {
+
+                resultadosLivros.innerHTML += `
+                    <div class="livro">
+
+                        <img src="${capa}">
+
+                        <div class="livro-info">
+
+                            <h3>${titulo}</h3>
+
+                            <p>${autor}</p>
+
+                            <button onclick="
+                                emprestarLivroCliente(
+                                    '${titulo}',
+                                    '${capa}'
+                                )
+                            ">
+                                Pegar Emprestado
+                            </button>
+
+                        </div>
+
+                    </div>
+                `;
+            }
         });
 
     } catch (error) {
@@ -226,15 +352,77 @@ function renderEmprestimos() {
     });
 }
 
+function emprestarLivroCliente(
+    titulo,
+    capa
+) {
 
+    const cliente =
+        localStorage.getItem("clienteNome");
 
-renderClientes();
-renderEmprestimos();
+    const hoje = new Date();
 
+    hoje.setDate(hoje.getDate() + 7);
 
-// ==========================
+    const devolucao =
+        hoje.toLocaleDateString("pt-BR");
+
+    const emprestimo = {
+        cliente,
+        titulo,
+        capa,
+        devolucao
+    };
+
+    emprestimos.push(emprestimo);
+
+    localStorage.setItem(
+        "emprestimos",
+        JSON.stringify(emprestimos)
+    );
+
+    renderEmprestimosCliente();
+
+    alert("Livro emprestado!");
+}
+
+function renderEmprestimosCliente() {
+
+    if(!listaEmprestimos) return;
+
+    listaEmprestimos.innerHTML =
+        "<h2>Meus Empréstimos</h2>";
+
+    const cliente =
+        localStorage.getItem("clienteNome");
+
+    emprestimos.forEach(item => {
+
+        if(item.cliente === cliente) {
+
+            listaEmprestimos.innerHTML += `
+                <div class="emprestimo">
+
+                    <img src="${item.capa}">
+
+                    <div>
+
+                        <h3>${item.titulo}</h3>
+
+                        <p>
+                            <strong>Devolver até:</strong>
+                            ${item.devolucao}
+                        </p>
+
+                    </div>
+
+                </div>
+            `;
+        }
+    });
+}
+
 // NAVEGAÇÃO ENTRE SEÇÕES
-// ==========================
 
 function mostrarSecao(secaoId) {
 
@@ -252,7 +440,93 @@ function mostrarSecao(secaoId) {
         .style.display = "block";
 }
 
-// COMEÇA MOSTRANDO LIVROS
+// CONTROLE DE LOGIN
+
+const tipoUsuario =
+    localStorage.getItem("tipoUsuario");
+
+const nomeCliente =
+    localStorage.getItem("clienteNome");
+
+// VERIFICA LOGIN
+if (
+    window.location.pathname.includes("index.html")
+) {
+
+    if(localStorage.getItem("logado") !== "true") {
+        window.location.href = "login.html";
+    }
+}
+
+const areaAdmin =
+    document.getElementById("area-admin");
+
+const areaCliente =
+    document.getElementById("area-cliente");
+
+// ESCONDE OS DOIS PRIMEIRO
+if(areaAdmin){
+    areaAdmin.style.display = "none";
+}
+
+if(areaCliente){
+    areaCliente.style.display = "none";
+}
+
+// MOSTRA O CERTO
+if(tipoUsuario === "admin"){
+
+    if(areaAdmin){
+        areaAdmin.style.display = "flex";
+    }
+
+}else if(tipoUsuario === "cliente"){
+
+    if(areaCliente){
+        areaCliente.style.display = "flex";
+    }
+}
+
+if(cadastroCliente){
+    renderClientes();
+}
+
+if(tipoUsuario === "admin") {
+
+    renderEmprestimos();
+
+} else if(tipoUsuario === "cliente") {
+
+    renderEmprestimosCliente();
+}
+
+// BOAS VINDAS
+
+const areaClienteTexto =
+    document.getElementById("boas-vindas");
+
+if(areaClienteTexto && nomeCliente) {
+
+    areaClienteTexto.innerHTML += `
+        <p style="
+            margin-top:20px;
+            font-size:18px;
+        ">
+            Bem-vindo, ${nomeCliente}!
+        </p>
+    `;
+}
+
+// LOGOUT
+
+function logout() {
+
+    localStorage.removeItem("logado");
+    localStorage.removeItem("tipoUsuario");
+    localStorage.removeItem("clienteNome");
+
+    window.location.href = "login.html";
+}
 
 
 

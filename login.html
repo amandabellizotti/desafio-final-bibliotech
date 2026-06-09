@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Tela de Login da Biblioteca</title>
+</head>
+<body>
+    <h1>LOGIN</h1>
+
+    <form id="login-form">
+        <label for="tipoUsuario">Tipo de Usuário:</label>
+        <select id="tipoUsuario" name="tipoUsuario" required>
+            <option value="cliente">Cliente</option>
+            <option value="admin">Administrador</option>
+        </select>
+
+        <label for="usuario">Usuário:</label>
+        <input type="text" id="usuario" name="usuario" required>
+
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" name="senha" required>
+        <a href="#" onclick="abrirCadastro()">Não tem cadastro? Cadastre-se</a>
+
+        <button type="button" onclick="entrar()">Entrar</button>
+    </form>
+
+    <!--modal pra cadastrar-se-->
+    <div id="modal-cadastro" class="modal">
+        <div id="conteudoModal">
+
+            <h2>Cadastro</h2>
+            <input type="text" id="novoUsuario" placeholder="Novo usuário">
+            
+            <input type="password" id="novaSenha" placeholder="Nova senha">
+            
+            <button onclick="cadastrar()">
+                Cadastrar
+            </button>
+            
+            <button onclick="fecharCadastro()">
+                Fechar
+            </button>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

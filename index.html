@@ -16,15 +16,27 @@
             <div>
                 <h1>BiblioTech</h1>
                 <p>Sistema Gerenciador da Biblioteca</p>
+
             </div>
-            <nav>
+            <!--area admin-->
+           
+            <nav id="area-admin">
             <button onclick="mostrarSecao('livros')"> 📚 Livros </button> 
             <button onclick="mostrarSecao('clientes')"> 👥 Cadastro de Clientes </button> 
             <button onclick="mostrarSecao('emprestimos')"> 📦 Empréstimos Ativos </button> 
+        </nav>
+        <!--area cliente-->
+        <nav id="area-cliente">
+                
+            <button onclick="mostrarSecao('livros')">📚 Buscar Livros</button>
+            <button onclick="mostrarSecao('emprestimos')">📦 Meus Empréstimos</button>
+        </nav>
+    </div>
         
        </nav>
         </div>
     </header>
+
     <div id="boas-vindas">
         <h2>Seja bem-vindo!</h2>
         <p>Escolha uma das opções acima para começar.</p>
@@ -75,6 +87,9 @@
             <!-- Lista aq-->
         </div>
     </section>
+</div>
+
+
     <script src="script.js"></script>
 </body>
 
